@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AI Hedge Fund Web Application Setup and Runner
+# Algorion Compass Web Application Setup and Runner
 # This script makes it easy for non-technical users to run the full web application
 
 set -e  # Exit on any error
@@ -213,7 +213,7 @@ install_frontend() {
 
 # Function to start both services
 start_services() {
-    print_status "Starting the AI Hedge Fund web application..."
+    print_status "Starting the Algorion Compass web application..."
     print_status "This will start both the backend API and frontend web interface"
     print_status "Press Ctrl+C to stop both services"
     echo ""
@@ -302,7 +302,7 @@ start_services() {
     open_browser "http://localhost:5173"
     
     echo ""
-    print_success "🚀 AI Hedge Fund web application is now running!"
+    print_success "🚀 Algorion Compass web application is now running!"
     print_success "🌐 Browser should open automatically to http://localhost:5173"
     echo ""
     print_status "Frontend (Web Interface): http://localhost:5173"
@@ -335,7 +335,7 @@ start_services() {
 # Main execution
 main() {
     echo ""
-    print_status "🚀 AI Hedge Fund Web Application Setup"
+    print_status "🚀 Algorion Compass Web Application Setup"
     print_status "This script will install dependencies and start both frontend and backend services"
     echo ""
     
@@ -350,7 +350,7 @@ main() {
 
 # Show help if requested
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "AI Hedge Fund Web Application Setup and Runner"
+    echo "Algorion Compass Web Application Setup and Runner"
     echo ""
     echo "Usage: ./run.sh"
     echo ""

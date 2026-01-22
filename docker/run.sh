@@ -2,7 +2,7 @@
 
 # Help text to display when --help is provided
 show_help() {
-  echo "AI Hedge Fund Docker Runner"
+  echo "Algorion Compass Docker Runner"
   echo ""
   echo "Usage: ./run.sh [OPTIONS] COMMAND"
   echo ""
@@ -342,11 +342,11 @@ if [ -n "$USE_OLLAMA" ]; then
   fi
 
   if [[ "$(docker images -q ai-hedge-fund 2> /dev/null)" == "" ]]; then
-    echo "Building AI Hedge Fund image..."
+    echo "Building Algorion Compass image..."
     docker build -t ai-hedge-fund -f Dockerfile ..
   fi
 
-  echo "Running AI Hedge Fund with Ollama using Docker Compose..."
+  echo "Running Algorion Compass with Ollama using Docker Compose..."
 
   if [ "$COMMAND" = "main" ]; then
     if [ -n "$SHOW_REASONING" ]; then

@@ -63,6 +63,15 @@ export function LeftSidebar({
         width: `${width}px`
       }}
     >
+      {/* Brand logo fills sidebar width */}
+      <div className="w-full">
+        <img
+          src="/logo.png"
+          alt="Algorion Compass"
+          className="block w-full h-auto object-contain"
+        />
+      </div>
+
       <FlowActions
         onSave={handleSaveCurrentFlow}
         onCreate={handleCreateNewFlow}

@@ -1,11 +1,11 @@
-# AI Hedge Fund - Frontend [WIP] 🚧
-This project is currently a work in progress.  To track progress, please get updates [here](https://x.com/virattt).
+# Algorion Compass - Frontend [WIP] 🚧
+This project is currently a work in progress.
 
-This is the frontend application for the AI Hedge Fund project. It provides a web interface to interact with the AI Hedge Fund system, allowing you to visualize and control the hedge fund operations.
+This is the frontend application for the Algorion Compass project. It provides a web interface to interact with the Algorion Compass system, allowing you to visualize and control the hedge fund operations.
 
 ## Overview
 
-This frontend project is built with React and Vite, serving as the client-side component of the AI Hedge Fund system. It connects to the backend API to provide a user-friendly interface for managing the hedge fund trading system and backtester.
+This frontend project is built with React and Vite, serving as the client-side component of the Algorion Compass system. It connects to the backend API to provide a user-friendly interface for managing the hedge fund trading system and backtester.
 
 ## Installation
 

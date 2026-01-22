@@ -8,7 +8,7 @@ router = APIRouter()
 
 @router.get("/")
 async def root():
-    return {"message": "Welcome to AI Hedge Fund API"}
+    return {"message": "Welcome to Algorion Compass API"}
 
 
 @router.get("/ping")

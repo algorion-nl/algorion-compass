@@ -61,7 +61,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
     SidebarStorageService.saveRightSidebarState(isRightCollapsed);
   }, [isRightCollapsed]);
 
-  // Calculate tab bar and bottom panel positioning based on actual sidebar widths
+  // Calculate bottom panel positioning based on actual sidebar widths
   const getSidebarBasedStyle = () => {
     let left = 0;
     let right = 0;
@@ -69,6 +69,21 @@ function LayoutContent({ children }: { children: ReactNode }) {
     if (!isLeftCollapsed) {
       left = leftSidebarWidth;
     }
+    
+    if (!isRightCollapsed) {
+      right = rightSidebarWidth;
+    }
+    
+    return {
+      left: `${left}px`,
+      right: `${right}px`,
+    };
+  };
+
+  // Calculate tab bar positioning; align with sidebar width to avoid overlap with logo
+  const getTabBarStyle = () => {
+    let left = isLeftCollapsed ? 0 : leftSidebarWidth;
+    let right = 0;
     
     if (!isRightCollapsed) {
       right = rightSidebarWidth;
@@ -116,7 +131,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
       {/* Tab Bar - positioned absolutely like bottom panel */}
       <div 
         className="absolute top-0 z-10 transition-all duration-200"
-        style={getSidebarBasedStyle()}
+        style={getTabBarStyle()}
       >
         <TabBar />
       </div>

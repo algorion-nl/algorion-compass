@@ -1,13 +1,13 @@
-# AI Hedge Fund - Backend [WIP] 🚧
-This project is currently a work in progress.  To track progress, please get updates [here](https://x.com/virattt).
+# Algorion Compass - Backend [WIP] 🚧
+This project is currently a work in progress.
 
-This is the backend server for the AI Hedge Fund project. It provides a simple REST API to interact with the AI Hedge Fund system, allowing you to run the hedge fund through a web interface.
+This is the backend server for the Algorion Compass project. It provides a simple REST API to interact with the Algorion Compass system, allowing you to run the hedge fund through a web interface.
 
 ## Overview
 
-This backend project is a FastAPI application that serves as the server-side component of the AI Hedge Fund system. It exposes endpoints for running the hedge fund trading system and backtester.
+This backend project is a FastAPI application that serves as the server-side component of the Algorion Compass system. It exposes endpoints for running the hedge fund trading system and backtester.
 
-This backend is designed to work with a future frontend application that will allow users to interact with the AI Hedge Fund system through their browser.
+This backend is designed to work with a future frontend application that will allow users to interact with the Algorion Compass system through their browser.
 
 ## Installation
 
@@ -15,7 +15,7 @@ This backend is designed to work with a future frontend application that will al
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/virattt/ai-hedge-fund.git
+git clone https://github.com/algorion-nl/algorion-compass.git
 cd ai-hedge-fund
 ```
 
@@ -68,7 +68,7 @@ The API will be available at:
 
 ## API Endpoints
 
-- `POST /hedge-fund/run`: Run the AI Hedge Fund with specified parameters
+- `POST /hedge-fund/run`: Run the Algorion Compass with specified parameters
 - `GET /ping`: Simple endpoint to test server connectivity
 
 ## Project Structure

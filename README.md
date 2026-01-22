@@ -1,4 +1,4 @@
-# AI Hedge Fund
+# Algorion Compass
 
 This is a proof of concept for an AI-powered hedge fund.  The goal of this project is to explore the use of AI to make trading decisions.  This project is for **educational** purposes only and is not intended for real trading or investment.
 
@@ -27,8 +27,6 @@ This system employs several agents working together:
 
 Note: the system does not actually make any trades.
 
-[![Twitter Follow](https://img.shields.io/twitter/follow/virattt?style=social)](https://twitter.com/virattt)
-
 ## Disclaimer
 
 This project is for **educational and research purposes only**.
@@ -52,13 +50,13 @@ By using this software, you agree to use it solely for learning purposes.
 
 ## How to Install
 
-Before you can run the AI Hedge Fund, you'll need to install it and set up your API keys. These steps are common to both the full-stack web application and command line interface.
+Before you can run the Algorion Compass, you'll need to install it and set up your API keys. These steps are common to both the full-stack web application and command line interface.
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/virattt/ai-hedge-fund.git
-cd ai-hedge-fund
+git clone https://github.com/algorion-nl/algorion-compass.git
+cd algorion-compass
 ```
 
 ### 2. Set up API keys
@@ -86,7 +84,7 @@ FINANCIAL_DATASETS_API_KEY=your-financial-datasets-api-key
 
 ### ⌨️ Command Line Interface
 
-You can run the AI Hedge Fund directly via terminal. This approach offers more granular control and is useful for automation, scripting, and integration purposes.
+You can run the Algorion Compass directly via terminal. This approach offers more granular control and is useful for automation, scripting, and integration purposes.
 
 <img width="992" alt="Screenshot 2025-01-06 at 5 50 17 PM" src="https://github.com/user-attachments/assets/e8ca04bf-9989-4a7d-a8b4-34e04666663b" />
 
@@ -102,12 +100,12 @@ curl -sSL https://install.python-poetry.org | python3 -
 poetry install
 ```
 
-#### Run the AI Hedge Fund
+#### Run the Algorion Compass
 ```bash
 poetry run python src/main.py --ticker AAPL,MSFT,NVDA
 ```
 
-You can also specify a `--ollama` flag to run the AI hedge fund using local LLMs.
+You can also specify a `--ollama` flag to run the Algorion Compass using local LLMs.
 
 ```bash
 poetry run python src/main.py --ticker AAPL,MSFT,NVDA --ollama
@@ -132,9 +130,9 @@ Note: The `--ollama`, `--start-date`, and `--end-date` flags work for the backte
 
 ### 🖥️ Web Application
 
-The new way to run the AI Hedge Fund is through our web application that provides a user-friendly interface. This is recommended for users who prefer visual interfaces over command line tools.
+The new way to run the Algorion Compass is through our web application that provides a user-friendly interface. This is recommended for users who prefer visual interfaces over command line tools.
 
-Please see detailed instructions on how to install and run the web application [here](https://github.com/virattt/ai-hedge-fund/tree/main/app).
+Please see detailed instructions on how to install and run the web application [here](https://github.com/algorion-nl/algorion-compass/tree/main/app).
 
 <img width="1721" alt="Screenshot 2025-06-28 at 6 41 03 PM" src="https://github.com/user-attachments/assets/b95ab696-c9f4-416c-9ad1-51feb1f5374b" />
 
@@ -151,7 +149,7 @@ Please see detailed instructions on how to install and run the web application [
 
 ## Feature Requests
 
-If you have a feature request, please open an [issue](https://github.com/virattt/ai-hedge-fund/issues) and make sure it is tagged with `enhancement`.
+If you have a feature request, please open an [issue](https://github.com/algorion-nl/algorion-compass/issues) and make sure it is tagged with `enhancement`.
 
 ## License
 

@@ -1,5 +1,5 @@
 @echo off
-REM AI Hedge Fund Web Application Setup and Runner (Windows)
+REM Algorion Compass Web Application Setup and Runner (Windows)
 REM This script makes it easy for non-technical users to run the full web application
 
 REM Colors for output
@@ -141,7 +141,7 @@ if not exist "backend" (
 )
 
 echo.
-echo %INFO% AI Hedge Fund Web Application Setup
+echo %INFO% Algorion Compass Web Application Setup
 echo %INFO% This script will install dependencies and start both frontend and backend services
 echo.
 
@@ -218,7 +218,7 @@ if exist "node_modules" (
 cd ..
 
 REM Start services
-echo %INFO% Starting the AI Hedge Fund web application...
+echo %INFO% Starting the Algorion Compass web application...
 echo %INFO% Press Ctrl+C to stop all services
 echo.
 
@@ -254,7 +254,7 @@ timeout /t 2 /nobreak >nul
 start http://localhost:5173
 
 echo.
-echo %SUCCESS% AI Hedge Fund web application is now running
+echo %SUCCESS% Algorion Compass web application is now running
 echo %INFO% Frontend: http://localhost:5173
 echo %INFO% Backend:  http://localhost:8000
 echo %INFO% Docs:     http://localhost:8000/docs

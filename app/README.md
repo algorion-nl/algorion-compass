@@ -1,12 +1,12 @@
 # Web Application
-The AI Hedge Fund app is a complete system with both frontend and backend components that enables you to run an AI-powered hedge fund trading system through a web interface on your own computer.
+The Algorion Compass app is a complete system with both frontend and backend components that enables you to run an AI-powered hedge fund trading system through a web interface on your own computer.
 
 <img width="1721" alt="Screenshot 2025-06-28 at 6 41 03 PM" src="https://github.com/user-attachments/assets/b95ab696-c9f4-416c-9ad1-51feb1f5374b" />
 
 
 ## Overview
 
-The AI Hedge Fund consists of:
+The Algorion Compass consists of:
 
 - **Backend**: A FastAPI application that provides a REST API to run the hedge fund trading system and backtester
 - **Frontend**: A React/Vite application that offers a user-friendly interface to visualize and control the hedge fund operations
@@ -52,7 +52,7 @@ run.bat
 
 ### Option 2: Using npm (Alternative)
 ```bash
-cd app && npm install && npm run setup
+cd app/frontend && npm install && npm run dev
 ```
 
 **That's it!** These scripts will:
@@ -86,7 +86,7 @@ If you prefer to set up each component manually or need more control:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/virattt/ai-hedge-fund.git
+git clone https://github.com/algorion-nl/algorion-compass.git
 cd ai-hedge-fund
 ```
 
@@ -227,5 +227,4 @@ If ports 8000 or 5173 are in use:
 - **Or use different ports** by modifying the scripts
 
 ### Getting Help
-- Check the [GitHub Issues](https://github.com/virattt/ai-hedge-fund/issues)
-- Follow updates on [Twitter](https://x.com/virattt) 
+- Check the [GitHub Issues](https://github.com/algorion-nl/algorion-compass/issues)
