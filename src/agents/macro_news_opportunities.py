@@ -1,7 +1,7 @@
 import json
 from typing import List, Optional
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 
@@ -19,10 +19,17 @@ class MacroNewsPick(BaseModel):
     strengths: str = Field(description="2–3 bullet-like strengths, concise; separated by '; '")
     risks: str = Field(description="1–2 key risks, concise; separated by '; '")
     best_experts: List[str] = Field(description="2–3 expert agent names chosen from the allowed list only")
+    confidence: Optional[int] = Field(
+        default=5,
+        ge=1,
+        le=5,
+        description="Conviction score from 1 (weak) to 5 (very strong) based on macro alignment"
+    )
 
 
 class MacroNewsPicksOutput(BaseModel):
     picks: List[MacroNewsPick] = Field(description="Exactly five picks best aligned to the macro news context")
+
 
 EXPERT_LIST = [
     f"{cfg['display_name']} Agent"
@@ -40,7 +47,7 @@ def macro_news_opportunities_agent(state: AgentState, agent_id: str = "macro_new
       - fallback_date (str): optional, purely for labeling in reasoning
     
     Outputs:
-      - message (HumanMessage): JSON with {"picks": [...]} using MacroNewsPicksOutput schema
+      - message (AIMessage): JSON with {"picks": [...]} using MacroNewsPicksOutput schema
       - state['data']['macro_news_picks']: same JSON payload for downstream use
     """
     data = state.get("data", {})
@@ -55,15 +62,24 @@ def macro_news_opportunities_agent(state: AgentState, agent_id: str = "macro_new
                 "system",
                 (
                     "You are an investment strategist agent. Convert the given macro news context into 5 "
-                    "actionable company picks with concise theses and risks. Always choose the most salient, "
-                    "liquid, and representative names tied to the macro catalysts.\n\n"
+                    "actionable company picks with concise theses and risks.\n\n"
+                    "Selection rubric (internal):\n"
+                    "1) Direct exposure to the macro catalyst\n"
+                    "2) Liquidity and investability\n"
+                    "3) Durability of advantage or asymmetry\n"
+                    "4) Clear upside vs downside framing\n\n"
                     "Rules:\n"
                     "- Return strict JSON only.\n"
                     "- Produce exactly five picks.\n"
-                    "- For each pick, select 2–3 'best_experts' ONLY from this list:\n"
+                    "- Choose the most salient, liquid, and representative names tied to the macro catalysts.\n"
+                    "- Do not assign the same expert to more than three picks.\n"
+                    "- Use at least four distinct experts across all picks.\n"
+                    "- Select 2–3 'best_experts' ONLY from this list:\n"
                     f"{EXPERT_LIST}\n"
-                    "- Keep 'strengths' and 'risks' concise; use '; ' as a separator between fragments.\n"
-                    "- Prefer primary tickers where applicable. For baskets, leave 'ticker' null.\n"
+                    "- Match experts thoughtfully to the company and sector.\n"
+                    "- Keep 'strengths' and 'risks' concise; use '; ' as a separator.\n"
+                    "- Prefer primary tickers; for baskets leave 'ticker' null.\n"
+                    "- If context is thin, default to globally relevant large-cap leaders.\n"
                 ),
             ),
             (
@@ -81,7 +97,8 @@ def macro_news_opportunities_agent(state: AgentState, agent_id: str = "macro_new
                     '      "thesis": "string",\n'
                     '      "strengths": "point; point; point",\n'
                     '      "risks": "risk; risk",\n'
-                    '      "best_experts": ["Name Agent","Name Agent"]\n'
+                    '      "best_experts": ["Name Agent","Name Agent"],\n'
+                    '      "confidence": 1-5\n'
                     "    }}\n"
                     "  ]\n"
                     "}}\n"
@@ -100,15 +117,32 @@ def macro_news_opportunities_agent(state: AgentState, agent_id: str = "macro_new
         state=state,
     )
 
+    # Post-validation and cleanup
+    for pick in llm_out.picks:
+        # Ensure experts are in allowed list
+        pick.best_experts = [e for e in pick.best_experts if e in EXPERT_LIST]
+        if not (2 <= len(pick.best_experts) <= 3):
+            raise ValueError(f"Pick {pick.company} has invalid number of experts: {pick.best_experts}")
+
+    if len(llm_out.picks) != 5:
+        raise ValueError("Agent must return exactly 5 picks")
+
     result_json = json.dumps(llm_out.model_dump(), ensure_ascii=False)
-    message = HumanMessage(content=result_json, name=agent_id)
+    message = AIMessage(content=result_json, name=agent_id)
 
     # Save to state for downstream use
     state.setdefault("data", {})
     state["data"]["macro_news_picks"] = llm_out.model_dump()
 
+    # Optional reasoning display
     if state.get("metadata", {}).get("show_reasoning"):
-        show_agent_reasoning(llm_out.model_dump(), "Macro News Opportunities Agent")
+        show_agent_reasoning(
+            {
+                "assumptions": "Derived from macro context and global themes",
+                "output": llm_out.model_dump()
+            },
+            "Macro News Opportunities Agent"
+        )
 
     progress.update_status(agent_id, None, "Done")
 
@@ -116,4 +150,3 @@ def macro_news_opportunities_agent(state: AgentState, agent_id: str = "macro_new
         "messages": state.get("messages", []) + [message],
         "data": state["data"],
     }
-
