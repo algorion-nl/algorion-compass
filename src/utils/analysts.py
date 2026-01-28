@@ -179,7 +179,7 @@ if macro_news_opportunities_agent:
         "description": "Turns macro news context into 5 actionable picks",
         "investing_style": "Converts macro/geopolitical developments into company-level opportunities with concise theses and expert mapping.",
         "agent_func": macro_news_opportunities_agent,
-        "type": "analyst",
+        "type": "start",
         "order": 17,
     }
 
@@ -203,4 +203,5 @@ def get_agents_list():
             "order": config["order"]
         }
         for key, config in sorted(ANALYST_CONFIG.items(), key=lambda x: x[1]["order"])
+        if config.get("type") == "analyst"
     ]
