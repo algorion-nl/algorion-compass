@@ -19,6 +19,10 @@ from src.agents.rakesh_jhunjhunwala import rakesh_jhunjhunwala_agent
 from src.agents.mohnish_pabrai import mohnish_pabrai_agent
 from src.agents.news_sentiment import news_sentiment_agent
 from src.agents.growth_agent import growth_analyst_agent
+try:
+    from src.agents.macro_news_opportunities import macro_news_opportunities_agent
+except Exception:
+    macro_news_opportunities_agent = None
 
 # Define analyst configuration - single source of truth
 ANALYST_CONFIG = {
@@ -167,6 +171,17 @@ ANALYST_CONFIG = {
         "order": 16,
     },
 }
+
+# Register macro news agent if import succeeded
+if macro_news_opportunities_agent:
+    ANALYST_CONFIG["macro_news_opportunities"] = {
+        "display_name": "Macro News Opportunities",
+        "description": "Turns macro news context into 5 actionable picks",
+        "investing_style": "Converts macro/geopolitical developments into company-level opportunities with concise theses and expert mapping.",
+        "agent_func": macro_news_opportunities_agent,
+        "type": "analyst",
+        "order": 17,
+    }
 
 # Derive ANALYST_ORDER from ANALYST_CONFIG for backwards compatibility
 ANALYST_ORDER = [(config["display_name"], key) for key, config in sorted(ANALYST_CONFIG.items(), key=lambda x: x[1]["order"])]

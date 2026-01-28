@@ -49,36 +49,83 @@ function ProgressSection({ sortedAgents }: { sortedAgents: [string, any][] }) {
 function SummarySection({ outputData }: { outputData: any }) {
   if (!outputData) return null;
 
+  // If we have standard decisions, render the trading summary
+  if (outputData.decisions) {
+    return (
+      <Card className="bg-transparent mb-4">
+        <CardHeader>
+          <CardTitle className="text-lg">Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ticker</TableHead>
+                <TableHead>Action</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Confidence</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Object.entries(outputData.decisions).map(([ticker, decision]: [string, any]) => (
+                <TableRow key={ticker}>
+                  <TableCell className="font-medium">{ticker}</TableCell>
+                  <TableCell>
+                    <span className={cn("font-medium", getActionColor(decision.action || ''))}>
+                      {decision.action?.toUpperCase() || 'UNKNOWN'}
+                    </span>
+                  </TableCell>
+                  <TableCell>{decision.quantity || 0}</TableCell>
+                  <TableCell>{decision.confidence?.toFixed(1) || 0}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // If this was a macro news run, render picks summary
+  if (outputData.picks && Array.isArray(outputData.picks)) {
+    return (
+      <Card className="bg-transparent mb-4">
+        <CardHeader>
+          <CardTitle className="text-lg">Macro Picks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Company</TableHead>
+                <TableHead>Ticker</TableHead>
+                <TableHead>Sector</TableHead>
+                <TableHead>Confidence</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {outputData.picks.map((pick: any, idx: number) => (
+                <TableRow key={`${pick.company || idx}`}>
+                  <TableCell className="font-medium">{pick.company}</TableCell>
+                  <TableCell>{pick.ticker || '-'}</TableCell>
+                  <TableCell>{pick.sector || '-'}</TableCell>
+                  <TableCell>{typeof pick.confidence === 'number' ? pick.confidence : '-'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="bg-transparent mb-4">
       <CardHeader>
         <CardTitle className="text-lg">Summary</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Ticker</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Confidence</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {Object.entries(outputData.decisions).map(([ticker, decision]: [string, any]) => (
-              <TableRow key={ticker}>
-                <TableCell className="font-medium">{ticker}</TableCell>
-                <TableCell>
-                  <span className={cn("font-medium", getActionColor(decision.action || ''))}>
-                    {decision.action?.toUpperCase() || 'UNKNOWN'}
-                  </span>
-                </TableCell>
-                <TableCell>{decision.quantity || 0}</TableCell>
-                <TableCell>{decision.confidence?.toFixed(1) || 0}%</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="text-muted-foreground">No summary available.</div>
       </CardContent>
     </Card>
   );

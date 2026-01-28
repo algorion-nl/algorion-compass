@@ -12,8 +12,47 @@ from app.backend.services.backtest_service import BacktestService
 from app.backend.services.api_key_service import ApiKeyService
 from src.utils.progress import progress
 from src.utils.analysts import get_agents_list
+from typing import Any, Dict
 
 router = APIRouter(prefix="/hedge-fund")
+
+
+def _build_final_payload(result: dict) -> Dict[str, Any]:
+    """
+    Normalize the final graph result into a unified payload the frontend understands.
+    Prefers explicit trade 'decisions' when available; otherwise supports macro 'picks'.
+    """
+    data = (result.get("data") or {}) if isinstance(result, dict) else {}
+    payload: Dict[str, Any] = {
+        "analyst_signals": data.get("analyst_signals", {}),
+        "current_prices": data.get("current_prices", {}),
+    }
+
+    # Parse the last message for either decisions or picks
+    messages = result.get("messages") or []
+    last_msg = messages[-1] if messages else None
+    last_content = getattr(last_msg, "content", None) if last_msg is not None else None
+    parsed_last = parse_hedge_fund_response(last_content) if last_content else None
+
+    if isinstance(parsed_last, dict):
+        if "decisions" in parsed_last:
+            payload["decisions"] = parsed_last["decisions"]
+            return payload
+        if "picks" in parsed_last:
+            payload["picks"] = parsed_last["picks"]
+            return payload
+
+    # Fallback: check state for macro agent output
+    macro_picks = data.get("macro_news_picks")
+    if isinstance(macro_picks, dict) and "picks" in macro_picks:
+        payload["picks"] = macro_picks["picks"]
+        return payload
+
+    # Last resort: if parsed_last is a dict, pass it as decisions for backward compatibility
+    if isinstance(parsed_last, dict):
+        payload["decisions"] = parsed_last
+
+    return payload
 
 @router.post(
     path="/run",
@@ -126,14 +165,7 @@ async def run(request_data: HedgeFundRequest, request: Request, db: Session = De
                     yield ErrorEvent(message="Failed to generate hedge fund decisions").to_sse()
                     return
 
-                # Send the final result
-                final_data = CompleteEvent(
-                    data={
-                        "decisions": parse_hedge_fund_response(result.get("messages", [])[-1].content),
-                        "analyst_signals": result.get("data", {}).get("analyst_signals", {}),
-                        "current_prices": result.get("data", {}).get("current_prices", {}),
-                    }
-                )
+                final_data = CompleteEvent(data=_build_final_payload(result))
                 yield final_data.to_sse()
 
             except asyncio.CancelledError:

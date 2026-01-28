@@ -47,6 +47,8 @@ def create_graph(graph_nodes: list, graph_edges: list) -> StateGraph:
     
     # Track which nodes are portfolio managers for special handling
     portfolio_manager_nodes = set()
+    # Track macro start node if present
+    macro_start_id: str | None = None
     
     # Add agent nodes
     for unique_agent_id in agent_ids:
@@ -56,6 +58,9 @@ def create_graph(graph_nodes: list, graph_edges: list) -> StateGraph:
         if base_agent_key == "portfolio_manager":
             portfolio_manager_nodes.add(unique_agent_id)
             continue
+        # Prefer macro_news_opportunities as start when present
+        if base_agent_key == "macro_news_opportunities" and macro_start_id is None:
+            macro_start_id = unique_agent_id
             
         # Skip if the base agent key is not in our analyst configuration
         if base_agent_key not in ANALYST_CONFIG:
@@ -105,11 +110,13 @@ def create_graph(graph_nodes: list, graph_edges: list) -> StateGraph:
                 graph.add_edge(edge.source, edge.target)
     
     # Connect start_node to nodes that don't have incoming edges from other agents
-    for agent_id in agent_ids:
-        if agent_id not in nodes_with_incoming_edges:
-            base_agent_key = extract_base_agent_key(agent_id)
-            if base_agent_key in ANALYST_CONFIG and base_agent_key != "portfolio_manager":
-                graph.add_edge("start_node", agent_id)
+    # If a macro start node is present, we set it as the entry and do not add default start edges
+    if macro_start_id is None:
+        for agent_id in agent_ids:
+            if agent_id not in nodes_with_incoming_edges:
+                base_agent_key = extract_base_agent_key(agent_id)
+                if base_agent_key in ANALYST_CONFIG and base_agent_key != "portfolio_manager":
+                    graph.add_edge("start_node", agent_id)
     
     # Connect analysts that have direct connections to portfolio managers to their corresponding risk managers
     for analyst_id, portfolio_manager_id in direct_to_portfolio_managers.items():
@@ -123,9 +130,13 @@ def create_graph(graph_nodes: list, graph_edges: list) -> StateGraph:
     # Connect portfolio managers to END
     for portfolio_manager_id in portfolio_manager_nodes:
         graph.add_edge(portfolio_manager_id, END)
+    
+    # Ensure macro start node can terminate even without downstream nodes
+    if macro_start_id is not None:
+        graph.add_edge(macro_start_id, END)
 
     # Set the entry point to the start node
-    graph.set_entry_point("start_node")
+    graph.set_entry_point(macro_start_id if macro_start_id is not None else "start_node")
     return graph
 
 
@@ -153,6 +164,19 @@ def run_graph(
     start date, end date, show reasoning, model name,
     and model provider.
     """
+    # Build optional per-node data mapping for agents to consume
+    node_data_by_id = {}
+    try:
+        if request and getattr(request, "graph_nodes", None):
+            for node in request.graph_nodes:
+                node_id = getattr(node, "id", None)
+                node_data = getattr(node, "data", None)
+                if node_id is not None and node_data is not None:
+                    node_data_by_id[node_id] = node_data
+    except Exception:
+        # Non-fatal; proceed without node-specific data
+        node_data_by_id = {}
+
     return graph.invoke(
         {
             "messages": [
@@ -172,6 +196,7 @@ def run_graph(
                 "model_name": model_name,
                 "model_provider": model_provider,
                 "request": request,  # Pass the request for agent-specific model access
+                "node_data_by_id": node_data_by_id,  # Expose node-level config to agents
             },
         },
     )

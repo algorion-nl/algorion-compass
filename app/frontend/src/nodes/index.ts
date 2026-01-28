@@ -6,6 +6,7 @@ import { JsonOutputNode } from './components/json-output-node';
 import { PortfolioManagerNode } from './components/portfolio-manager-node';
 import { PortfolioStartNode } from './components/portfolio-start-node';
 import { StockAnalyzerNode } from './components/stock-analyzer-node';
+import { MacroNewsStartNode } from './components/macro-news-start-node';
 import { type AppNode } from './types';
 
 // Types
@@ -56,4 +57,5 @@ export const nodeTypes = {
   'portfolio-start-node': PortfolioStartNode,
   'portfolio-manager-node': PortfolioManagerNode,
   'stock-analyzer-node': StockAnalyzerNode,
+  'macro-news-start-node': MacroNewsStartNode,
 } satisfies NodeTypes;

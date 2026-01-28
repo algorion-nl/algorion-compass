@@ -77,6 +77,18 @@ const baseNodeTypeDefinitions: Record<string, NodeTypeDefinition> = {
       },
     }),
   },
+  "Macro News Opportunities": {
+    createNode: (position: { x: number, y: number }): AppNode => ({
+      id: `macro_news_opportunities_${generateUniqueIdSuffix()}`,
+      type: "macro-news-start-node" as any,
+      position,
+      data: {
+        name: "Macro News Opportunities",
+        description: "Paste or summarize macro news context to generate 5 actionable picks.",
+        status: "Idle",
+      },
+    } as AppNode),
+  },
 };
 
 /**
@@ -84,6 +96,11 @@ const baseNodeTypeDefinitions: Record<string, NodeTypeDefinition> = {
  */
 const getNodeTypeDefinitions = async (): Promise<Record<string, NodeTypeDefinition>> => {
   if (nodeTypeDefinitionsCache) {
+    // Ensure any new base definitions added during HMR are available
+    nodeTypeDefinitionsCache = {
+      ...baseNodeTypeDefinitions,
+      ...nodeTypeDefinitionsCache,
+    };
     return nodeTypeDefinitionsCache;
   }
 
