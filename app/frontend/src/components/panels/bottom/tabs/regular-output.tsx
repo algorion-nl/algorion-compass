@@ -5,6 +5,9 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { getActionColor, getDisplayName, getSignalColor, getStatusIcon } from './output-tab-utils';
 import { ReasoningContent } from './reasoning-content';
+import { Button } from '@/components/ui/button';
+import { useReactFlow } from '@xyflow/react';
+import { getNodeTypeDefinition } from '@/data/node-mappings';
 
 // Progress Section Component
 function ProgressSection({ sortedAgents }: { sortedAgents: [string, any][] }) {
@@ -88,6 +91,65 @@ function SummarySection({ outputData }: { outputData: any }) {
 
   // If this was a macro news run, render picks summary
   if (outputData.picks && Array.isArray(outputData.picks)) {
+    const reactFlowInstance = useReactFlow();
+
+    const createSwarmForPick = async (pick: any) => {
+      try {
+        // Prepare component names
+        const stockInputName = "Stock Input";
+        const pmName = "Portfolio Manager";
+        const advisorNames: string[] = (pick.best_experts || []).map((n: string) =>
+          n.replace(/\s+Agent$/i, '')
+        );
+
+        // Get node creators
+        const stockDef = await getNodeTypeDefinition(stockInputName);
+        const pmDef = await getNodeTypeDefinition(pmName);
+        const advisorDefs = await Promise.all(advisorNames.map((name) => getNodeTypeDefinition(name)));
+
+        if (!stockDef || !pmDef || advisorDefs.some((d) => !d)) {
+          console.warn("Missing node definition for swarm components");
+          return;
+        }
+
+        // Determine base position from viewport center
+        let baseX = 0, baseY = 0, zoom = 1;
+        try {
+          const vp = reactFlowInstance.getViewport();
+          const flowContainer = document.querySelector('.react-flow__viewport')?.parentElement;
+          const containerWidth = flowContainer?.clientWidth || window.innerWidth;
+          const containerHeight = flowContainer?.clientHeight || window.innerHeight;
+          zoom = vp.zoom || 1;
+          baseX = (containerWidth / 2 - (vp.x || 0)) / zoom;
+          baseY = (containerHeight / 2 - (vp.y || 0)) / zoom;
+        } catch {}
+
+        // Create nodes with simple layout
+        const nodesToAdd: any[] = [];
+        const edgesToAdd: any[] = [];
+
+        const stockNode = stockDef.createNode({ x: baseX - 300, y: baseY - 100 });
+        nodesToAdd.push(stockNode);
+
+        const pmNode = pmDef.createNode({ x: baseX + 300, y: baseY - 100 });
+        nodesToAdd.push(pmNode);
+
+        advisorDefs.forEach((def, idx) => {
+          const yOffset = (idx - Math.floor(advisorDefs.length / 2)) * 150;
+          const node = (def as any).createNode({ x: baseX, y: baseY - 100 + yOffset });
+          nodesToAdd.push(node);
+          edgesToAdd.push({ id: `${stockNode.id}-${node.id}`, source: stockNode.id, target: node.id });
+          edgesToAdd.push({ id: `${node.id}-${pmNode.id}`, source: node.id, target: pmNode.id });
+        });
+
+        // Add to canvas
+        reactFlowInstance.setNodes((nodes) => [...nodes, ...nodesToAdd]);
+        reactFlowInstance.setEdges((edges) => [...edges, ...edgesToAdd]);
+      } catch (e) {
+        console.error("Failed to create swarm:", e);
+      }
+    };
+
     return (
       <Card className="bg-transparent mb-4">
         <CardHeader>
@@ -102,6 +164,7 @@ function SummarySection({ outputData }: { outputData: any }) {
                 <TableHead>Sector</TableHead>
                 <TableHead>Advisors</TableHead>
                 <TableHead>Confidence</TableHead>
+                <TableHead>Create Swarm</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -116,6 +179,11 @@ function SummarySection({ outputData }: { outputData: any }) {
                       .join(', ') || '-'}
                   </TableCell>
                   <TableCell>{typeof pick.confidence === 'number' ? pick.confidence : '-'}</TableCell>
+                  <TableCell>
+                    <Button size="sm" variant="secondary" onClick={() => createSwarmForPick(pick)}>
+                      Create Swarm
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
