@@ -100,6 +100,7 @@ function SummarySection({ outputData }: { outputData: any }) {
                 <TableHead>Company</TableHead>
                 <TableHead>Ticker</TableHead>
                 <TableHead>Sector</TableHead>
+                <TableHead>Advisors</TableHead>
                 <TableHead>Confidence</TableHead>
               </TableRow>
             </TableHeader>
@@ -109,6 +110,11 @@ function SummarySection({ outputData }: { outputData: any }) {
                   <TableCell className="font-medium">{pick.company}</TableCell>
                   <TableCell>{pick.ticker || '-'}</TableCell>
                   <TableCell>{pick.sector || '-'}</TableCell>
+                  <TableCell>
+                    {(pick.best_experts || [])
+                      .map((name: string) => name.replace(/\s+Agent$/i, ''))
+                      .join(', ') || '-'}
+                  </TableCell>
                   <TableCell>{typeof pick.confidence === 'number' ? pick.confidence : '-'}</TableCell>
                 </TableRow>
               ))}
